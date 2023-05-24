@@ -1,18 +1,21 @@
+-- Zachary Chand , Dylan Mitchel Karambut 
+-- CS381 
+-- Tues , May 23
+-- Homework 5
 module HW5sol where
 import HW5types
-
 -- Function to compute the rank of a command
 rankC :: Cmd -> CmdRank
-rankC ADD = (2, 1)
-rankC MULT = (2, 1)
-rankC DUP = (1, 2)
-rankC DEC = (1, 1)
-rankC SWAP = (2, 2)
-rankC (POP n) = (n, 0)
-rankC (IFELSE _ _) = (0, 0) -- Handled separately in rankP
-rankC (LDB _) = (0, 1)
-rankC LEQ = (2, 1)
-
+rankC (LDI _) = (0, 1)        -- LDI command: consumes 0 items, produces 1 item
+rankC ADD = (2, 1)            -- ADD command: consumes 2 items, produces 1 item
+rankC MULT = (2, 1)           -- MULT command: consumes 2 items, produces 1 item
+rankC DUP = (1, 2)            -- DUP command: consumes 1 item, produces 2 items
+rankC DEC = (1, 1)            -- DEC command: consumes 1 item, produces 1 item
+rankC SWAP = (2, 2)           -- SWAP command: consumes 2 items, produces 2 items
+rankC (POP n) = (n, 0)        -- POP command: consumes n items, produces 0 items
+rankC (IFELSE _ _) = (0, 0)   -- IFELSE command: handled separately in rankP, consumes 0 items, produces 0 items
+rankC (LDB _) = (0, 1)        -- LDB command: consumes 0 items, produces 1 item
+rankC LEQ = (2, 1)            -- LEQ command: consumes 2 items, produces 1 item
 
 -- Function to compute the rank of a program
 rankP :: Prog -> Rank -> Maybe Rank
@@ -34,7 +37,6 @@ rankP prog rank = rank' prog rank
       _ -> let (n, m) = rankC cmd
            in if r >= n then Just (r - n + m) else Nothing
 
-
 -- Function to evaluate a program with a given stack
 run :: Prog -> Stack -> Result
 run prog stack =
@@ -43,7 +45,6 @@ run prog stack =
                 A newStack -> A newStack
                 _ -> TypeError
     Nothing -> RankError
-
 
 -- Auxiliary function to execute a single command
 semCmd :: Prog -> Stack -> Result
@@ -58,7 +59,6 @@ semCmd (cmd:cmds) stack = case cmd of
   _ -> case execCmd cmd stack of
          Just newStack -> semCmd cmds newStack
          Nothing -> TypeError
-
 
 -- Auxiliary function to execute a single command on the stack
 execCmd :: Cmd -> Stack -> Maybe Stack
@@ -85,3 +85,5 @@ dropFromStack n stack
 -- Auxiliary function to execute a list of commands
 execCmdList :: Prog -> Stack -> Maybe Stack
 execCmdList prog stack = foldl (\acc cmd -> acc >>= execCmd cmd) (Just stack) prog
+
+
